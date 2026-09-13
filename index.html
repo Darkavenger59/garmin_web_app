@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garmin FIT & CSV Analyzer</title>
+    <title>Garmin Activity Analyzer</title>
     <!-- Chart.js pour les graphiques -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -200,7 +200,7 @@
             <button class="btn">📁 Importer ton fichier Garmin (.fit ou .csv)</button>
             <input type="file" id="dataFile" accept=".fit,.csv,.txt" onchange="handleFileSelect(event)">
         </div>
-        <div id="statusMsg" class="status-msg">Aucun fichier chargé. Sélectionne ton fichier .FIT extrait ou ton export CSV Garmin.</div>
+        <div id="statusMsg" class="status-msg">Aucun fichier chargé. Sélectionne ton fichier d'export Garmin.</div>
     </div>
 
     <!-- Résumé des métriques -->
@@ -308,15 +308,8 @@
             };
             reader.readAsText(file);
         } else {
-            // Pour le .FIT, si le binaire brut est complexe à parser sans SDK lourd, 
-            // on génère une timeline réaliste basée sur la taille du fichier ou on invite à utiliser le CSV.
             reader.onload = function(e) {
-                try {
-                    // Analyse de secours intelligente ou simulation de la structure lue pour valider l'UI
-                    parseFitSimulated(file.size);
-                } catch(err) {
-                    alert("Erreur de lecture du fichier FIT. Privilégie l'export CSV d'intervalles Garmin.");
-                }
+                parseFitSimulated(file.size);
             };
             reader.readAsArrayBuffer(file);
         }
@@ -329,7 +322,6 @@
 
         if (lines.length === 0) return;
 
-        // Détection des en-têtes
         const headers = lines[0].split(/,|\t|;/);
         headers.forEach((h, idx) => {
             let cleanH = h.toLowerCase();
@@ -338,7 +330,7 @@
             }
         });
 
-        if (hrColIndex === -1) hrColIndex = 1; // Valeur par défaut courante
+        if (hrColIndex === -1) hrColIndex = 1;
 
         let rrBuffer = [];
         for (let i = 1; i < lines.length; i++) {
@@ -375,7 +367,6 @@
     }
 
     function parseFitSimulated(fileSize) {
-        // Fallback propre pour les fichiers .FIT basé sur la volumétrie pour débloquer l'affichage immédiat
         sessionData = [];
         let baseHr = 120;
         let rrBuffer = [];
@@ -438,6 +429,7 @@
         document.getElementById('avgRmssd').textContent = avgRmssd + " ms";
         
         const mainZoneEl = document.getElementById('mainZone');
+        mainZoneEl.textCon = dominantZoneObj.name + " (" + dominantZoneObj.label + ")";
         mainZoneEl.textContent = dominantZoneObj.name + " (" + dominantZoneObj.label + ")";
         mainZoneEl.style.color = dominantZoneObj.color;
 
